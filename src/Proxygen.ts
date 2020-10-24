@@ -29,7 +29,7 @@ export class Proxygen {
 
   constructor({ domains, proxies }: ProxygenConfig) {
     this.domains = domains
-    this.proxies = proxies.map((config) => new Proxy(config)).sort((a, b) => a.priority - b.priority)
+    this.proxies = proxies.map((config) => new Proxy(config))
   }
 
   async start() {

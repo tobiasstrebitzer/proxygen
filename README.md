@@ -21,12 +21,11 @@ proxygen proxygen.json
 
 Create a proxy configuration file named `proxygen.json`.
 
-For each proxy, you can configure a priority, conditions and action:
+For each proxy, you can configure conditions and an action:
 ```json
 {
   "domains": ["www.sample.dev"],
   "proxies": [{
-    "priority": 1,
     "conditions": [{ "target": "host", "type": "equals", "value": "www.sample.dev", "then": "pass" }],
     "action": { "type": "proxy", "host": "www.sample.com" }
   }]
@@ -65,22 +64,18 @@ Example Configuration:
   "domains": ["www.awesome.dev"],
   "proxies": [{
     "name": "APIServer",
-    "priority": 1,
     "conditions": [{ "target": "path", "type": "matches", "value": "^/api/", "then": "pass" }],
     "action": { "type": "proxy", "host": "127.0.0.1", "port": 9000 }
   }, {
     "name": "GraphQLServer",
-    "priority": 2,
     "conditions": [{ "target": "path", "type": "matches", "value": "^/graphql/", "then": "pass" }],
     "action": { "type": "proxy", "host": "127.0.0.1", "port": 9001 }
   }, {
     "name": "CloudStorage",
-    "priority": 3,
     "conditions": [{ "target": "path", "type": "matches", "value": "^/cdn/", "then": "pass" }],
     "action": { "type": "cache", "protocol": "https:", "host": "cdn.awesome.com", "root": "/tmp/cdn" }
   }, {
     "name": "Website",
-    "priority": 4,
     "action": { "type": "proxy", "host": "127.0.0.1", "port": "8080" }
   }]
 }

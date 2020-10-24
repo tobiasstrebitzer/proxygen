@@ -44,18 +44,15 @@ export interface ProxyScope {
 }
 
 export interface ProxyConfig {
-  priority?: number
   conditions?: ProxyCondition[]
   action: ProxyAction
 }
 
 export class Proxy {
-  public priority: number
   private conditions: ProxyCondition[]
   private action: ProxyAction
 
-  constructor({ priority, conditions, action }: ProxyConfig) {
-    this.priority = priority ?? 1
+  constructor({ conditions, action }: ProxyConfig) {
     this.conditions = conditions ?? []
     this.action = action
   }
