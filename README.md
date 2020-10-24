@@ -64,22 +64,22 @@ Example Configuration:
 {
   "domains": ["www.awesome.dev"],
   "proxies": [{
-    // API Server
+    "name": "APIServer",
     "priority": 1,
     "conditions": [{ "target": "path", "type": "matches", "value": "^/api/", "then": "pass" }],
     "action": { "type": "proxy", "host": "127.0.0.1", "port": 9000 }
   }, {
-    // GraphQL Server
+    "name": "GraphQLServer",
     "priority": 2,
     "conditions": [{ "target": "path", "type": "matches", "value": "^/graphql/", "then": "pass" }],
     "action": { "type": "proxy", "host": "127.0.0.1", "port": 9001 }
   }, {
-    // Cloud Storage
+    "name": "CloudStorage",
     "priority": 3,
     "conditions": [{ "target": "path", "type": "matches", "value": "^/cdn/", "then": "pass" }],
     "action": { "type": "cache", "protocol": "https:", "host": "cdn.awesome.com", "root": "/tmp/cdn" }
   }, {
-    // Website
+    "name": "Website",
     "priority": 4,
     "action": { "type": "proxy", "host": "127.0.0.1", "port": "8080" }
   }]
