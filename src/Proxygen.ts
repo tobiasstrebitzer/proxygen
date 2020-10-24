@@ -41,6 +41,11 @@ export class Proxygen {
   }
 
   private onRequest(req: IncomingMessage, res: ServerResponse) {
+    if (req.method === 'GET' && req.url === '/proxygen/status' && getHost(req) === '127.0.0.1') {
+      res.statusCode = 200
+      res.end('ok')
+      return
+    }
     const result = this.handleRequest(req)
     if (!result) { return this.notFound(res) }
     const { action, url } = result
@@ -63,8 +68,6 @@ export class Proxygen {
         const readStream = createReadStream(filepath)
         readStream.on('open', () => { readStream.pipe(res) })
         readStream.on('error', (err) => { res.end(err) })
-      } else {
-        debugger
       }
     } else if (action.type === 'proxy') {
       if (url.host) { req.headers['host'] = url.host }
