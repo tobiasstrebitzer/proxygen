@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+import { existsSync, readFileSync } from 'fs-extra'
+import { Proxygen, ProxygenConfig } from './index'
+
+export async function main() {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+  const [arg] = process.argv.slice(-1)
+  const configPath = existsSync(arg) ? arg : (existsSync('progygen.json') ? 'progygen.json' : null)
+  if (!configPath) { throw new Error('Unable to detect path to progygen config') }
+  const config: ProxygenConfig = JSON.parse(readFileSync(configPath, 'utf8'))
+  const proxygen = new Proxygen(config)
+  await proxygen.start()
+  console.info('proxygen is running')
+}
+
+export default main()
