@@ -6,7 +6,7 @@
       "type": "pwa-node",
       "request": "launch",
       "args": [
-        "${workspaceRoot}/src/index.ts",
+        "${workspaceRoot}/src/cli.ts",
         "test/proxygen.json"
       ],
       "runtimeArgs": [
