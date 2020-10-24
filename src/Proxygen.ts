@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, mkdirpSync, writeFileSync } from 'fs-extra'
+import { createReadStream, existsSync, lstatSync, mkdirpSync, writeFileSync } from 'fs-extra'
 import { createServer as createHttpServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http'
 import ProxyServer, { createProxyServer } from 'http-proxy'
 import { createServer as createHttpsServer, Server as HttpsServer, ServerOptions as HttpsServerOptions } from 'https'
@@ -56,7 +56,7 @@ export class Proxygen {
       res.end()
     } else if (action.type === 'cache') {
       const filepath = join(action.root, fullPath)
-      if (req.method === 'GET' && !existsSync(filepath)) {
+      if (req.method === 'GET' && !existsSync(filepath) && url.path !== '') {
         fetch(remoteUrl, { method: 'GET', compress: true }).then((response) => response.buffer()).then((buffer) => {
           mkdirpSync(dirname(filepath))
           writeFileSync(filepath, buffer)
@@ -65,9 +65,16 @@ export class Proxygen {
         if (url.path) { req.url = fullPath }
         this.proxyServer.web(req, res, { target: url, secure: true })
       } else if (existsSync(filepath)) {
-        const readStream = createReadStream(filepath)
-        readStream.on('open', () => { readStream.pipe(res) })
-        readStream.on('error', (err) => { res.end(err) })
+        const stats = lstatSync(filepath)
+        if (stats.isFile()) {
+          const readStream = createReadStream(filepath)
+          readStream.on('open', () => { readStream.pipe(res) })
+          readStream.on('error', (err) => { res.end(err) })
+        } else {
+          if (url.host) { req.headers['host'] = url.host }
+          if (url.path) { req.url = fullPath }
+          this.proxyServer.web(req, res, { target: url, secure: true })
+        }
       }
     } else if (action.type === 'proxy') {
       if (url.host) { req.headers['host'] = url.host }
