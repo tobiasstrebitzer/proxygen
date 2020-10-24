@@ -12,7 +12,7 @@ npm install -g proxygen
 
 ## Usage
 
-Launch progygen:
+Launch proxygen:
 ```bash
 proxygen proxygen.json
 ```
@@ -28,7 +28,7 @@ For each proxy, you can configure a priority, conditions and action:
   "proxies": [{
     "priority": 1,
     "conditions": [{ "target": "host", "type": "equals", "value": "www.sample.dev", "then": "pass" }],
-    "action": { "type": "proxy", "host": "www.sample.com", }
+    "action": { "type": "proxy", "host": "www.sample.com" }
   }]
 }
 ```
@@ -40,7 +40,7 @@ Make sure to create hosts file entries for the domains you have specified:
 
 ## SSL Certificates
 
-progygen will automatically create SSL certificates for the domains specified. When you start proxygen the first time, a CA certificate will be installed in `~/.proxygen/proxygen.ca.cert.pem`. Make sure to 'trust' this certificate in your keychain settings.
+proxygen will automatically create SSL certificates for the domains specified. When you start proxygen the first time, a CA certificate will be installed in `~/.proxygen/proxygen.ca.cert.pem`. Make sure to 'trust' this certificate in your keychain settings.
 
 ## Use Cases
 
