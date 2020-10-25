@@ -19,6 +19,7 @@
     "fs-extra": "^9.0.0",
     "http-proxy": "^1.18.1",
     "mkcert": "^1.4.0",
+    "mmmagic": "^0.5.3",
     "node-fetch": "^2.6.0",
     "pino": "^6.7.0",
     "pino-pretty": "^4.3.0"
@@ -27,6 +28,7 @@
     "@types/fs-extra": "^9.0.1",
     "@types/http-proxy": "^1.17.4",
     "@types/mkcert": "^1.2.0",
+    "@types/mmmagic": "^0.4.30",
     "@types/node": "^13.5.0",
     "@types/node-fetch": "^2.5.7",
     "@types/pino": "^6.3.3",

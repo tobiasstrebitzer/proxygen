@@ -160,7 +160,10 @@ export class Proxygen {
     if (stats.isFile) {
       this.logResponse(request, response, 'HIT')
       request.enableCors()
-      return request.stream(createReadStream(filepath))
+      request.setContentType(filepath).then(() => {
+        request.stream(createReadStream(filepath))
+      }).catch(() => { })
+      return
     }
     if (response.url && request.method === 'GET' && !stats.exists) {
       request.cache(filepath, response).catch((error) => { this.logError(error, request.host) })
@@ -187,7 +190,10 @@ export class Proxygen {
 
   private logRequest(request: ProxyRequest, response: ProxyResponse) {
     const payload: LogPayload = { msg: `~> ${request.url}`, method: request.method, type: response.action.type }
-    if (payload.type === 'notFound') { payload.statusCode = 404 }
+    if (payload.type === 'notFound') {
+      payload.statusCode = 404
+      payload.level = 'error'
+    }
     if (payload.type === 'status') { payload.statusCode = 200 }
     if (payload.type) { payload.msg = `(${payload.type}) ${payload.msg}` }
     if (payload.method) { payload.msg = `[${payload.method}] ${payload.msg}` }

@@ -62,6 +62,13 @@
   resolved "https://registry.yarnpkg.com/@types/mkcert/-/mkcert-1.2.0.tgz#28fed2bb60069f8f026792ebdf9b684154c4d4c8"
   integrity sha512-adNsPReyTkTLcZ5uBd90Dx5qoOgYBe3mg5/ud8Ubcj/3pdyIoM3UQCpONEsLZlz6tu0040iWWXk4KC3D78E89w==
 
+"@types/mmmagic@^0.4.30":
+  version "0.4.30"
+  resolved "https://registry.yarnpkg.com/@types/mmmagic/-/mmmagic-0.4.30.tgz#768f67c2ad4a2dde4d10e4dac3156735aaa8d6fb"
+  integrity sha512-9vIXhXpcWjOF07LHN96Rdq9zI+jd7ah9de3vaAw2+rxzy+i6+aVIkIm52Xgr0i89YaP0M1Az3A65a20/VDWDTg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node-fetch@^2.5.7":
   version "2.5.7"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.7.tgz#20a2afffa882ab04d44ca786449a276f9f6bbf3c"
@@ -938,6 +945,13 @@ mkdirp@^0.5.3:
   dependencies:
     minimist "^1.2.5"
 
+mmmagic@^0.5.3:
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/mmmagic/-/mmmagic-0.5.3.tgz#a28feb0cf85632fd6a1e233e4a584990ae0d7302"
+  integrity sha512-xLqCu7GJYTzJczg0jafXFuh+iPzQL/ru0YYf4GiTTz8Cehru/wiXtUS8Pp8Xi77zNaiVndJ0OO1yAFci6iHyFg==
+  dependencies:
+    nan "^2.13.2"
+
 mri@1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/mri/-/mri-1.1.4.tgz#7cb1dd1b9b40905f1fac053abe25b6720f44744a"
@@ -952,6 +966,11 @@ mute-stream@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
   integrity sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==
+
+nan@^2.13.2:
+  version "2.14.2"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
+  integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
 
 natural-compare@^1.4.0:
   version "1.4.0"

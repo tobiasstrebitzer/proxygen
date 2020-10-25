@@ -1,6 +1,7 @@
 import { existsSync, lstatSync, mkdirpSync, writeFileSync } from 'fs-extra'
 import { IncomingMessage } from 'http'
 import { createCert } from 'mkcert'
+import { Magic, MAGIC_MIME_TYPE } from 'mmmagic'
 import { homedir } from 'os'
 import { join } from 'path'
 
@@ -42,4 +43,20 @@ export async function createCertificate(domains: string[]) {
   if (!existsSync(caCertPath)) { writeFileSync(caCertPath, CA.cert, 'utf8') }
   const { key, cert } = await createCert({ domains, validityDays: 365, caKey: CA.key, caCert: CA.cert })
   return { key, cert, ca: CA.cert }
+}
+
+const magic = new Magic(MAGIC_MIME_TYPE)
+
+export function detectContentType(filepath: string) {
+  return new Promise<string | null>((resolve) => {
+    magic.detectFile(filepath, (error, result) => {
+      if (error) {
+        resolve(null)
+      } else if (typeof result === 'string') {
+        resolve(result)
+      } else {
+        resolve(result[0])
+      }
+    })
+  })
 }

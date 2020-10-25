@@ -6,7 +6,7 @@ import fetch from 'node-fetch'
 import { dirname } from 'path'
 import { TLSSocket } from 'tls'
 import { ProxyResponse } from './Proxy'
-import { getHost } from './utils'
+import { detectContentType, getHost } from './utils'
 
 export type ProxygenSocket = (Socket | TLSSocket) & { __host?: string, encrypted?: boolean }
 
@@ -80,6 +80,11 @@ export class ProxyRequest {
     const buffer = await result.buffer()
     mkdirpSync(dirname(filepath))
     writeFileSync(filepath, buffer)
+  }
+
+  async setContentType(filepath: string) {
+    const contentType = await detectContentType(filepath)
+    if (contentType) { this.res.setHeader('Content-Type', contentType) }
   }
 
   get encrypted() { return !!this.socket.encrypted }
