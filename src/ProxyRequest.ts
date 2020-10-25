@@ -45,7 +45,7 @@ export class ProxyRequest {
   }
 
   proxy(proxyServer: ProxyServer, response: ProxyResponse) {
-    if (response.host) { this.req.headers['host'] = response.host }
+    if (!response.action.excludeHost) { this.req.headers['host'] = this.host }
     if (response.pathWithQuery) { this.req.url = response.pathWithQuery }
     proxyServer.web(this.req, this.res, { target: response.url, secure: true })
     return this.promise

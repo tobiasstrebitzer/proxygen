@@ -108,8 +108,10 @@ export class Proxygen {
   }
 
   private onClientError(error: Error & { code: string }, socket: ProxygenSocket) {
-    this.logError(error, socket.__host)
     socket.destroy()
+    if (error.code === 'ECONNRESET') { return }
+    this.logError(error, socket.__host)
+
   }
 
   private handleRequest(request: ProxyRequest): ProxyResponse {

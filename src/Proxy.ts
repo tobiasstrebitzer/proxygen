@@ -21,6 +21,7 @@ export type ProxyAction = {
   path?: string
   query?: string
   root?: string
+  excludeHost?: boolean
 }
 
 export interface ProxyResponse {
