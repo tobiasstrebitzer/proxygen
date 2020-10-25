@@ -14,7 +14,7 @@ export interface ProxyCondition {
 }
 
 export type ProxyAction = {
-  type: 'status' | 'notFound' | 'proxy' | 'redirect' | 'cache'
+  type: 'status' | 'notFound' | 'proxy' | 'redirect' | 'cache' | 'options'
   host?: string
   protocol?: 'http' | 'https'
   port?: number

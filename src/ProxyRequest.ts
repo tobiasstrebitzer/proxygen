@@ -39,6 +39,19 @@ export class ProxyRequest {
     })
   }
 
+  enableCors() {
+    if (this.req.headers['access-control-request-method']) {
+      this.res.setHeader('access-control-allow-methods', this.req.headers['access-control-request-method'])
+    }
+    if (this.req.headers['access-control-request-headers']) {
+      this.res.setHeader('access-control-allow-headers', this.req.headers['access-control-request-headers'])
+    }
+    if (this.req.headers.origin) {
+      this.res.setHeader('access-control-allow-origin', this.req.headers.origin)
+      this.res.setHeader('access-control-allow-credentials', 'true')
+    }
+  }
+
   redirect(Location: string, statusCode = 302) {
     this.res.writeHead(statusCode, { Location })
     this.res.end()
@@ -47,7 +60,7 @@ export class ProxyRequest {
   proxy(proxyServer: ProxyServer, response: ProxyResponse) {
     if (!response.action.excludeHost) { this.req.headers['host'] = this.host }
     if (response.pathWithQuery) { this.req.url = response.pathWithQuery }
-    proxyServer.web(this.req, this.res, { target: response.url, secure: true })
+    proxyServer.web(this.req, this.res, { target: response.url, secure: true, changeOrigin: true })
     return this.promise
   }
 
@@ -56,7 +69,7 @@ export class ProxyRequest {
     stream.on('error', (error) => { this.res.end(error) })
   }
 
-  respond(message: string, statusCode = 200) {
+  respond(message?: string, statusCode = 200) {
     this.res.statusCode = statusCode
     this.res.end(message)
   }

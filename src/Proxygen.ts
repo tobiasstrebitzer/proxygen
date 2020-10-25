@@ -54,7 +54,9 @@ export class Proxygen {
     const request = new ProxyRequest(req, res)
     const response = this.handleRequest(request)
     this.logRequest(request, response)
-    if (response.action.type === 'notFound') {
+    if (response.action.type === 'options') {
+      this.handleOptions(request, response)
+    } else if (response.action.type === 'notFound') {
       this.handleNotFound(request, response)
     } else if (response.action.type === 'status') {
       this.handleStatus(request, response)
@@ -74,8 +76,11 @@ export class Proxygen {
       if (forceHost) { proxyReq.setHeader('host', forceHost) }
       proxyReq.setHeader('host', req.headers['host']!)
     })
-    proxyServer.on('proxyRes', (_, req: ProxyReq, res) => {
-      if (req.__request) { req.__request.resolve(res) }
+    proxyServer.on('proxyRes', (proxyRes, req: ProxyReq, res) => {
+      if (req.__request) {
+        req.__request.enableCors()
+        req.__request.resolve(res)
+      }
     })
     proxyServer.on('error', (error, req: ProxyReq, res, url) => {
       if (req.__request) { req.__request.reject(error) }
@@ -116,6 +121,7 @@ export class Proxygen {
 
   private handleRequest(request: ProxyRequest): ProxyResponse {
     if (request.method === 'GET' && request.path === '/proxygen/status') { return { host: request.host, action: { type: 'status' } } }
+    if (request.method === 'OPTIONS') { return { host: request.host, action: { type: 'options' } } }
     const proxy = this.proxies.find((p) => p.shouldHandleRequest(request))
     if (!proxy) { return { host: request.host, action: { type: 'notFound' } } }
     return proxy.handleRequest(request)
@@ -133,6 +139,11 @@ export class Proxygen {
     request.redirect(response.url!)
   }
 
+  private handleOptions(request: ProxyRequest, response: ProxyResponse) {
+    request.enableCors()
+    request.respond()
+  }
+
   private handleProxy(request: ProxyRequest, response: ProxyResponse) {
     request.proxy(this.proxyServer, response).then((proxyResponse) => {
       this.logResponse(request, response, proxyResponse.statusCode)
@@ -148,6 +159,7 @@ export class Proxygen {
     const stats = statFile(filepath)
     if (stats.isFile) {
       this.logResponse(request, response, 'HIT')
+      request.enableCors()
       return request.stream(createReadStream(filepath))
     }
     if (response.url && request.method === 'GET' && !stats.exists) {
