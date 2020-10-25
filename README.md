@@ -24,7 +24,7 @@ Create a proxy configuration file named `proxygen.json`.
 For each proxy, you can configure conditions and an action:
 ```json
 {
-  "domains": ["www.sample.dev"],
+  "hosts": ["www.sample.dev"],
   "proxies": [{
     "conditions": [{ "target": "host", "type": "equals", "value": "www.sample.dev", "then": "pass" }],
     "action": { "type": "proxy", "host": "www.sample.com" }
@@ -32,7 +32,7 @@ For each proxy, you can configure conditions and an action:
 }
 ```
 
-Make sure to create hosts file entries for the domains you have specified:
+Make sure to create hosts file entries for the hosts you have specified:
 ```
 127.0.0.1 www.sample.dev
 ```
@@ -61,7 +61,7 @@ Example Configuration:
 
 ```json
 {
-  "domains": ["www.awesome.dev"],
+  "hosts": ["www.awesome.dev"],
   "proxies": [{
     "name": "APIServer",
     "conditions": [{ "target": "path", "type": "matches", "value": "^/api/", "then": "pass" }],

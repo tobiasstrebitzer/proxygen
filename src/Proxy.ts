@@ -1,8 +1,5 @@
-import { IncomingMessage } from 'http'
-import { Socket } from 'net'
-import { parse } from 'uri-js'
-import { Url } from 'url'
-import { formatString, getHost } from './utils'
+import { ProxyRequest } from './ProxyRequest'
+import { formatString } from './utils'
 
 export type ProxyConditionTarget = 'host' | 'path' | 'url' | 'protocol' | 'extension' | 'query'
 export type ProxyConditionType = 'matches' | 'equals' | 'contains'
@@ -17,30 +14,22 @@ export interface ProxyCondition {
 }
 
 export type ProxyAction = {
-  type: string
+  type: 'status' | 'notFound' | 'proxy' | 'redirect' | 'cache'
   host?: string
   protocol?: 'http' | 'https'
   port?: number
   path?: string
   query?: string
-} & (
-    { type: 'proxy' } |
-    { type: 'redirect' } |
-    { type: 'cache', root: string }
-  )
-
-export interface ProxyResult {
-  url: Partial<Url>
-  action: ProxyAction
+  root?: string
 }
 
-export interface ProxyScope {
-  protocol: string
+export interface ProxyResponse {
+  action: ProxyAction
   host: string
-  path: string
-  url: string
+  url?: string
+  path?: string
   query?: string
-  extension?: string
+  pathWithQuery?: string
 }
 
 export interface ProxyConfig {
@@ -57,11 +46,10 @@ export class Proxy {
     this.action = action
   }
 
-  shouldHandleRequest(req: IncomingMessage) {
-    const scope = this.getScope(req)
+  shouldHandleRequest(request: ProxyRequest) {
     if (this.conditions.length === 0) { return true }
     for (const condition of this.conditions) {
-      const checkPassed = this.conditionCheck(condition.type, condition.value, scope[condition.target] ?? '')
+      const checkPassed = this.conditionCheck(condition.type, condition.value, request[condition.target] ?? '')
       if (checkPassed && condition.then === 'pass') { return true }
       if (checkPassed && condition.then === 'fail') { return false }
       if (!checkPassed && condition.else === 'pass') { return true }
@@ -70,28 +58,16 @@ export class Proxy {
     return false
   }
 
-  handleRequest(req: IncomingMessage): ProxyResult {
-    const scope = this.getScope(req)
+  handleRequest(request: ProxyRequest): ProxyResponse {
     const regex = /:(protocol|host|path|url|query|extension)/g
-    const protocol = this.action.protocol ? formatString<ProxyScope>(this.action.protocol, regex, scope) : scope.protocol
-    const host = this.action.host ? formatString<ProxyScope>(this.action.host, regex, scope) : scope.host
-    const path = this.action.path ? formatString<ProxyScope>(this.action.path, regex, scope) : scope.path
-    const query = this.action.query ? formatString<ProxyScope>(this.action.query, regex, scope) : scope.query
-    const url: Partial<Url> = { protocol, host, path, query }
-    if (this.action.port) { url.port = String(this.action.port) }
-    return { url, action: this.action }
-  }
-
-  private getScope(req: IncomingMessage): ProxyScope {
-    const host = getHost(req)!
-    const { encrypted } = req.socket as Socket & { encrypted: boolean }
-    const info = parse(req.url ?? '/')!
-    const path = info.path ?? '/'
-    const query = info.query
-    const protocol = encrypted ? 'https:' : 'http:'
-    const extension = path.split('.').pop()
-    const url = `${protocol}//${host}${path}${query ? `?${query}` : ''}`
-    return { protocol, host, path, query, url, extension }
+    const protocol = this.action.protocol ? formatString<ProxyRequest>(this.action.protocol, regex, request) : request.protocol
+    const host = this.action.host ? formatString<ProxyRequest>(this.action.host, regex, request) : request.host
+    const path = this.action.path ? formatString<ProxyRequest>(this.action.path, regex, request) : request.path
+    const query = this.action.query ? formatString<ProxyRequest>(this.action.query, regex, request) : request.query
+    const pathWithQuery = `${path}${query ? `?${query}` : ''}`
+    const port = this.action.port ? String(this.action.port) : null
+    const url = `${protocol}//${host}${port ? `:${port}` : ''}${pathWithQuery}`
+    return { url, host, path, query, pathWithQuery, action: this.action }
   }
 
   private conditionCheck(type: ProxyConditionType, conditionValue: string | number, value: string) {

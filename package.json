@@ -20,7 +20,8 @@
     "http-proxy": "^1.18.1",
     "mkcert": "^1.4.0",
     "node-fetch": "^2.6.0",
-    "uri-js": "^4.2.2"
+    "pino": "^6.7.0",
+    "pino-pretty": "^4.3.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
@@ -28,6 +29,7 @@
     "@types/mkcert": "^1.2.0",
     "@types/node": "^13.5.0",
     "@types/node-fetch": "^2.5.7",
+    "@types/pino": "^6.3.3",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
     "eslint": "^6.8.0",

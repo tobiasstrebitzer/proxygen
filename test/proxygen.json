@@ -1,5 +1,5 @@
 {
-  "domains": [
+  "hosts": [
     "www.magloft.dev",
     "cdn.magloft.dev"
   ],
