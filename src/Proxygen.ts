@@ -74,8 +74,11 @@ export class Proxygen {
       if (forceHost) { proxyReq.setHeader('host', forceHost) }
       proxyReq.setHeader('host', req.headers['host']!)
     })
-    proxyServer.on('proxyRes', (proxyReq, req: ProxyReq, res) => {
+    proxyServer.on('proxyRes', (_, req: ProxyReq, res) => {
       if (req.__request) { req.__request.resolve(res) }
+    })
+    proxyServer.on('error', (error, req: ProxyReq, res, url) => {
+      if (req.__request) { req.__request.reject(error) }
     })
     return proxyServer
   }
@@ -100,6 +103,7 @@ export class Proxygen {
     httpsServer.on('upgrade', this.websocketsUpgrade.bind(this))
     httpsServer.on('error', (error) => { this.logError(error) })
     httpsServer.on('clientError', this.onClientError.bind(this))
+    httpsServer.on('tslClientError', this.onClientError.bind(this))
     return httpsServer
   }
 
@@ -130,7 +134,10 @@ export class Proxygen {
   private handleProxy(request: ProxyRequest, response: ProxyResponse) {
     request.proxy(this.proxyServer, response).then((proxyResponse) => {
       this.logResponse(request, response, proxyResponse.statusCode)
-    }).catch((error) => { this.logError(error, request.host) })
+    }).catch((error: Error) => {
+      this.logResponse(request, response, 'ERROR', 'error')
+      this.logError(error, request.host)
+    })
   }
 
   private handleCache(request: ProxyRequest, response: ProxyResponse) {
@@ -175,8 +182,8 @@ export class Proxygen {
     logger.info(payload)
   }
 
-  private logResponse(request: ProxyRequest, response: ProxyResponse, proxyResponse: string | number) {
-    const payload: LogPayload = { msg: `<~ ${response.url}`, method: request.method, type: response.action.type }
+  private logResponse(request: ProxyRequest, response: ProxyResponse, proxyResponse: string | number, level = 'info') {
+    const payload: LogPayload = { msg: `<~ ${response.url}`, method: request.method, type: response.action.type, level }
     if (payload.type) { payload.msg = `(${payload.type}) ${payload.msg}` }
     if (payload.method) { payload.msg = `[${payload.method}] ${payload.msg}` }
     payload.msg = `${payload.msg} {${proxyResponse}}`

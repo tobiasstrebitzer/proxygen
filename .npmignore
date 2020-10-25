@@ -2,5 +2,4 @@
 .eslintrc
 .eslintignore
 src/
-test/
 tsconfig.json

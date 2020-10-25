@@ -26,13 +26,17 @@ export class ProxyRequest {
   private socket: ProxygenSocket
   private promise: Promise<ServerResponse>
   resolve!: (value?: ServerResponse | PromiseLike<ServerResponse> | undefined) => void
+  reject!: (error?: Error) => void
 
   constructor(private req: ProxyReq, private res: ServerResponse) {
     this.host = getHost(req)
     this.socket = req.socket
     this.socket.__host = this.host
     req.__request = this
-    this.promise = new Promise<ServerResponse>((resolve) => { this.resolve = resolve })
+    this.promise = new Promise<ServerResponse>((resolve, reject) => {
+      this.resolve = resolve
+      this.reject = reject
+    })
   }
 
   redirect(Location: string, statusCode = 302) {

@@ -7,7 +7,7 @@
       "request": "launch",
       "args": [
         "${workspaceRoot}/src/cli.ts",
-        "test/proxygen.json"
+        "~/proxygen.json"
       ],
       "runtimeArgs": [
         "--require=ts-node/register"
