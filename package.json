@@ -18,6 +18,7 @@
   "dependencies": {
     "fs-extra": "^9.0.0",
     "http-proxy": "^1.18.1",
+    "mime-types": "^2.1.27",
     "mkcert": "^1.4.0",
     "mmmagic": "^0.5.3",
     "node-fetch": "^2.6.0",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
     "@types/http-proxy": "^1.17.4",
+    "@types/mime-types": "^2.1.0",
     "@types/mkcert": "^1.2.0",
     "@types/mmmagic": "^0.4.30",
     "@types/node": "^13.5.0",

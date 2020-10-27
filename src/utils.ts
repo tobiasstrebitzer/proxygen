@@ -1,5 +1,6 @@
 import { existsSync, lstatSync, mkdirpSync, writeFileSync } from 'fs-extra'
 import { IncomingMessage } from 'http'
+import { lookup } from 'mime-types'
 import { createCert } from 'mkcert'
 import { Magic, MAGIC_MIME_TYPE } from 'mmmagic'
 import { homedir } from 'os'
@@ -49,6 +50,8 @@ const magic = new Magic(MAGIC_MIME_TYPE)
 
 export function detectContentType(filepath: string) {
   return new Promise<string | null>((resolve) => {
+    const contentType = lookup(filepath)
+    if (contentType) { resolve(contentType); return }
     magic.detectFile(filepath, (error, result) => {
       if (error) {
         resolve(null)
