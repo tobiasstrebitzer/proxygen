@@ -1,4 +1,3 @@
-import { createReadStream } from 'fs-extra'
 import { createServer as createHttpServer, IncomingMessage, Server as HttpServer, ServerResponse } from 'http'
 import ProxyServer, { createProxyServer } from 'http-proxy'
 import { createServer as createHttpsServer, Server as HttpsServer, ServerOptions as HttpsServerOptions } from 'https'
@@ -7,7 +6,8 @@ import pino, { Logger } from 'pino'
 import { createSecureContext, SecureContextOptions } from 'tls'
 import { Proxy, ProxyConfig, ProxyResponse } from './Proxy'
 import { ProxygenSocket, ProxyReq, ProxyRequest } from './ProxyRequest'
-import { createCertificate, getHost, statFile } from './utils'
+import { ProxyResource } from './ProxyResource'
+import { createCertificate, getHost } from './utils'
 
 export interface LogPayload {
   msg: string
@@ -154,21 +154,33 @@ export class Proxygen {
   }
 
   private handleCache(request: ProxyRequest, response: ProxyResponse) {
-    if (!response.action.root) { throw new Error('Missing root configuration for cache proxy') }
-    const filepath = join(response.action.root, String(response.pathWithQuery))
-    const stats = statFile(filepath)
-    if (stats.isFile) {
+    const root = response.action.root
+    if (!root) { throw new Error('Missing root configuration for cache proxy') }
+    const resource = new ProxyResource(request, join(root, String(response.pathWithQuery)))
+    if (resource.isFile) {
       this.logResponse(request, response, 'HIT')
-      request.enableCors()
-      request.setContentType(filepath).then(() => {
-        request.stream(createReadStream(filepath))
-      }).catch(() => { })
-      return
+      return resource.send()
     }
-    if (response.url && request.method === 'GET' && !stats.exists) {
-      request.cache(filepath, response).catch((error) => { this.logError(error, request.host) })
+    if (response.url && request.method === 'GET' && !resource.exists) {
+      request.cache(resource.path, response).then((success) => {
+        if (success) {
+          this.handleProxy(request, response)
+        } else {
+          const plainResource = new ProxyResource(request, join(root, String(response.path)))
+          if (plainResource.isFile) {
+            this.logResponse(request, response, 'HIT')
+            return plainResource.send()
+          } else {
+            this.handleProxy(request, response)
+          }
+        }
+      }).catch((error) => {
+        this.logError(error, request.host)
+        this.handleProxy(request, response)
+      })
+    } else {
+      this.handleProxy(request, response)
     }
-    this.handleProxy(request, response)
   }
 
   private handleNotFound(request: ProxyRequest, response: ProxyResponse) {

@@ -74,12 +74,13 @@ export class ProxyRequest {
     this.res.end(message)
   }
 
-  async cache(filepath: string, response: ProxyResponse) {
+  async cache(filepath: string, response: ProxyResponse): Promise<boolean> {
     const result = await fetch(response.url!, { method: 'GET', compress: true })
-    if (!result.ok) { return }
+    if (!result.ok) { return false }
     const buffer = await result.buffer()
     mkdirpSync(dirname(filepath))
     writeFileSync(filepath, buffer)
+    return true
   }
 
   async setContentType(filepath: string) {
