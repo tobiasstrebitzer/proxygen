@@ -24,7 +24,7 @@ export interface ProxyScope {
 export class ProxyRequest {
   public host: string
   private socket: ProxygenSocket
-  private promise: Promise<ServerResponse>
+  private promise: Promise<ServerResponse | undefined>
   resolve!: (value?: ServerResponse | PromiseLike<ServerResponse> | undefined) => void
   reject!: (error?: Error) => void
 
@@ -33,7 +33,7 @@ export class ProxyRequest {
     this.socket = req.socket
     this.socket.__host = this.host
     req.__request = this
-    this.promise = new Promise<ServerResponse>((resolve, reject) => {
+    this.promise = new Promise<ServerResponse | undefined>((resolve, reject) => {
       this.resolve = resolve
       this.reject = reject
     })

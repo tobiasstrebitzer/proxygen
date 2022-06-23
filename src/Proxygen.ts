@@ -82,8 +82,10 @@ export class Proxygen {
         req.__request.resolve(res)
       }
     })
-    proxyServer.on('error', (error, req: ProxyReq, res, url) => {
-      if (req.__request) { req.__request.reject(error) }
+    proxyServer.on('error', (error, req: ProxyReq) => {
+      if (req.__request) {
+        this.logError(error, req.__request.host)
+      }
     })
     return proxyServer
   }
@@ -146,7 +148,7 @@ export class Proxygen {
 
   private handleProxy(request: ProxyRequest, response: ProxyResponse) {
     request.proxy(this.proxyServer, response).then((proxyResponse) => {
-      this.logResponse(request, response, proxyResponse.statusCode)
+      this.logResponse(request, response, proxyResponse?.statusCode ?? 'unknown')
     }).catch((error: Error) => {
       this.logResponse(request, response, 'ERROR', 'error')
       this.logError(error, request.host)
